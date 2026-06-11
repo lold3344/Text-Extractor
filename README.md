@@ -1,14 +1,17 @@
 # Text Extractor
 
-Консольный инструмент для сбора текста с веб-сайтов и записи в базу данных ARIA.
+Консольный инструмент для сбора русского текста с веб-сайтов и записи в базу данных ARIA.
 
 ---
 
 ## Что делает
 
-- Принимает URL из консоли
-- Скачивает страницу и извлекает текст из параграфов и заголовков
-- Добавляет текст в файл `DataBase.txt` в папке проекта ARIA
+- Принимает до 500 ссылок за раз
+- Скачивает страницы параллельно
+- Извлекает только русский текст (кириллица, фильтр >50%)
+- Ищет текст в параграфах, блоках, таблицах и списках
+- Убирает сноски вида [1], [2] и мусор
+- Сохраняет в базу данных ARIA, а если ARIA не установлена - создаёт `DataBase.txt` на рабочем столе
 
 Текст дописывается в конец файла, предыдущие данные не удаляются.
 
@@ -26,7 +29,7 @@
 ## Запуск
 
 ```bash
-cd C:\Users\lold\Documents\GitHub\Text-Extractor
+cd C:\Users\USER\Documents\GitHub\Text-Extractor
 cargo run
 ```
 
@@ -34,31 +37,51 @@ cargo run
 
 ## Использование
 
+Вставляй ссылки по одной, когда закончил - пиши `go`:
+
 ```
 === Text Extractor for ARIA ===
 Output: C:\Users\lold\Documents\GitHub\ARIA\data base\DataBase.txt
 
-Enter URL (or 'exit' to quit):
+Paste up to 500 URLs (one per line).
+When done - type 'go' and press Enter.
+
 > https://ru.wikipedia.org/wiki/Искусственный_интеллект
-Fetching: https://ru.wikipedia.org/wiki/Искусственный_интеллект
-Saved 12453 characters to DataBase.txt
-
+Added [1/500]: https://ru.wikipedia.org/wiki/Искусственный_интеллект
 > https://ru.wikipedia.org/wiki/Нейронная_сеть
-Fetching: ...
-Saved 8721 characters to DataBase.txt
+Added [2/500]: https://ru.wikipedia.org/wiki/Нейронная_сеть
+> go
+Processing 2 URLs...
+Output: C:\Users\lold\Documents\GitHub\ARIA\data base\DataBase.txt
 
-> exit
-Goodbye.
+Fetching: https://ru.wikipedia.org/wiki/Искусственный_интеллект
+Fetching: https://ru.wikipedia.org/wiki/Нейронная_сеть
+[OK] 12453 chars - https://ru.wikipedia.org/wiki/Искусственный_интеллект
+[OK] 8721 chars - https://ru.wikipedia.org/wiki/Нейронная_сеть
+
+Done: 2/2 pages saved to DataBase.txt
 ```
-
-Вводи ссылки по одной, каждая добавляется в конец `DataBase.txt`. Работает с Wikipedia и большинством обычных сайтов.
 
 ---
 
 ## Куда сохраняется текст
 
+Если ARIA установлена:
 ```
 C:\Users\lold\Documents\GitHub\ARIA\data base\DataBase.txt
 ```
 
-Этот файл используется ARIA для обучения. После наполнения базы запусти ARIA - она автоматически построит словарь и проведёт предобучение на новых данных.
+Если ARIA не найдена - файл создаётся на рабочем столе:
+```
+C:\Users\lold\Desktop\DataBase.txt
+```
+
+Программа сообщит куда сохраняет при каждом запуске.
+
+---
+
+## Примечания
+
+- Английские и другие неруссkие сайты будут пропущены с пометкой `[SKIP]`
+- Таймаут на загрузку страницы - 60 секунд
+- Все ссылки в батче загружаются параллельно
